@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebSockets</title>
+</head>
+
+<body>
+  <h1>WEBSOCKETS</h1>
+
+
+  <input id="msg" type="text" />
+  <button type="button" onclick="sendMesage()">Send</button>
+  <ul id="messages"></ul>
+
+  <!-- <script> -->
+  <!--   const {port, hostname} = window.location; -->
+  <!---->
+  <!--   const ws = new WebSocket(`ws://${hostname}:${3000}`); -->
+  <!---->
+  <!--   ws.onopen = () => { -->
+  <!--     console.log("connected to server"); -->
+  <!--   }; -->
+  <!---->
+  <!--   ws.onmessage = (event) => { -->
+  <!--     console.log("message from server:", event.data); -->
+  <!--     const messagesList = document.getElementById("messages"); -->
+  <!--     const messageItem = document.createElement("li"); -->
+  <!--     messageItem.textContent = event.data; -->
+  <!--     messagesList.appendChild(messageItem); -->
+  <!--   }; -->
+  <!---->
+  <!--   ws.onclose = () => { -->
+  <!--     console.log("connection closed"); -->
+  <!--   }; -->
+  <!---->
+  <!--   ws.onerror = (err) => { -->
+  <!--     console.log("failed due to error", err); -->
+  <!--   }; -->
+  <!---->
+  <!---->
+  <!--   function sendMesage() { -->
+  <!--     const inputElement = document.getElementById("msg") -->
+  <!--     ws.send(inputElement.value) -->
+  <!--     inputElement.value = "" -->
+  <!--   } -->
+  <!---->
+  <!-- </script> -->
+</body>
+
+</html>

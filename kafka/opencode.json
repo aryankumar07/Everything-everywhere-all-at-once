@@ -1,0 +1,25 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "permission": {
+    "edit": "ask",
+    "question": "allow",
+    "bash": {
+      "*": "allow",
+      "rm *": "ask",
+      "rmdir *": "ask",
+      "mv *": "ask",
+      "chmod *": "ask",
+      "chown *": "ask",
+      "sudo *": "ask",
+      "kill *": "ask",
+      "pkill *": "ask",
+      "git reset *": "ask",
+      "git clean *": "ask",
+      "git push *": "ask",
+      "docker system prune *": "ask",
+      "docker volume rm *": "ask",
+      "docker compose down *": "ask"
+    }
+  }
+}
