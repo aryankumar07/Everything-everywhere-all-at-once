@@ -1,19 +1,31 @@
-import { db } from "../db/index.js";
+import { db, broadCastConnection } from "../db/index.js";
+import { BroadCastPlayer } from "./getplayer.js";
 
 
 export const joinGame = (req, res) => {
-  const { gameId, clientId } = req.body;
+  const { playerName, clientId, color, isAdmin } = req.body;
+  const gameId = String(req.body.gameId)
 
-  if (!db.has(gameId)) {
+  if (!db.has(gameId) || !broadCastConnection.has(gameId)) {
     return res.status(400).json({
       msg: "Invalid GameId",
     });
   }
+  let gameData = db.get(gameId)
 
-  db.get(gameId).add(clientId);
+  gameData = {
+    ...gameData,
+    players: [
+      ...gameData["players"],
+      { clientId, playerName, color, isAdmin },
+    ]
+  }
+  db.set(gameId, gameData)
+  BroadCastPlayer(gameId)
 
   return res.status(200).json({
     msg: "Added to the lobby",
-    isAdmin: false,
+    gameId,
+    gameData
   });
 };

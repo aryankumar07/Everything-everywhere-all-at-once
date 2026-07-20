@@ -1,19 +1,31 @@
 import { db } from "../db/index.js";
-import { WebSocket } from "ws";
+import { BroadCastPlayer } from "./getplayer.js";
 
 export const createGame = (req, res) => {
-  const { clientId, gameId } = req.body
+  const { clientId, playerName, color, isAdmin, timer } = req.body
+  const gameId = String(req.body.gameId)
+
   if (db.has(gameId)) {
-    res.status(400).json({
+    return res.status(400).json({
       msg: "gameId already exist somehow"
     })
   }
-  const player = new Set();
-  player.add(clientId)
-  db.set(gameId, player)
-  const ws = new WebSocket("ws://localhost:8000/ws")
-  res.status(200).json({
-    msg: "Lobby created and player enterd in the room",
-    isAdmin: true,
+
+
+  const gameDetails = {
+    duration: timer,
+    players: [
+      { clientId, playerName, color, isAdmin },
+    ],
+  }
+  const connnectionSet = new Set()
+  connnectionSet.add(res)
+  db.set(gameId, gameDetails)
+  BroadCastPlayer(gameId)
+
+  return res.status(200).json({
+    msg: "Lobby created and player entered in the room",
+    gameId,
+    gameDetails,
   })
 }
