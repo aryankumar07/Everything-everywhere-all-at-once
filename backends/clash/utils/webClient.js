@@ -1,9 +1,9 @@
 import { WebSocketServer } from "ws";
-import { handleClick, handleStop, JoinPlayers } from "./ws_utils.js";
+import { handleClick, handleStop, JoinPlayers, handleDisconnect } from "./ws_utils.js";
 
 
 export const WebClient = (server, path) => {
-  const webServer = WebSocketServer({ server, path })
+  const webServer = new WebSocketServer({ server, path })
   webServer.on("connection", (socket) => {
     console.log("WebSockeet Connected")
     socket.gameId = null
@@ -28,5 +28,6 @@ export const WebClient = (server, path) => {
           break;
       }
     })
+    socket.on("close", () => handleDisconnect(socket))
   })
 }

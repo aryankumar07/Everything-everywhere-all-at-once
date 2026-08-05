@@ -13,10 +13,14 @@ export const joinGame = (req, res) => {
   }
   let gameData = db.get(gameId)
 
+  // Idempotent by clientId: drop any existing entry for this player before
+  // adding, so re-joining (e.g. returning to the lobby after a round) updates
+  // them in place instead of creating a duplicate.
+  const others = gameData["players"].filter((p) => p.clientId !== clientId)
   gameData = {
     ...gameData,
     players: [
-      ...gameData["players"],
+      ...others,
       { clientId, playerName, color, isAdmin },
     ]
   }

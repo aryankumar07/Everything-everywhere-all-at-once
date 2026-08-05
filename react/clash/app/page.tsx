@@ -2,14 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { getRandomId } from '@/utils/getRandomid';
-import { useSocket } from '@/utils/socketContext';
+import { pickPlayerColor } from '@/utils/playerColors';
+import { setPendingIdentity } from '@/utils/identity';
 import Modal from '@/component/model';
 import { useState, useRef } from 'react';
 
 export default function Home() {
 
   const router = useRouter()
-  const { joinGame } = useSocket()
   const inputRef = useRef<HTMLInputElement>(null)
   const nameRef = useRef<HTMLInputElement>(null)
 
@@ -17,13 +17,17 @@ export default function Home() {
   const [newGameOpen, setNewGameOpen] = useState(false)
   const [newGameId, setNewGameId] = useState('')
 
-  const enterGame = async (id: string, name: string) => {
-    try {
-      await joinGame(id, name)
-      router.replace(`/game/${id}/${name}`);
-    } catch {
-      alert("Could not connect to the game server");
-    }
+  // Generate this player's identity, stash it for the lobby route to pick up
+  // after the redirect, then navigate. The lobby page does the actual
+  // /create or /join once it mounts.
+  const enterGame = (id: string, name: string, isAdmin: boolean) => {
+    setPendingIdentity(id, {
+      clientId: getRandomId(),
+      playerName: name,
+      color: pickPlayerColor(),
+      isAdmin,
+    });
+    router.push(`/lobby/${id}`);
   };
 
   const onGenerateNewGame = () => {
@@ -32,10 +36,12 @@ export default function Home() {
   }
 
   const onStartGame = () => {
-    if (!nameRef || !nameRef.current) {
+    const name = nameRef.current?.value.trim();
+    if (!name) {
       alert("Please provide a name dear")
+      return;
     }
-    enterGame(newGameId, nameRef.current!.value);
+    enterGame(newGameId, name, true);
   }
 
   const onJoinGame = () => {
@@ -44,13 +50,14 @@ export default function Home() {
 
     if (!name) {
       alert("Please provide a name dear")
+      return;
     }
     if (!id) {
       alert("No Game ID provided");
       return;
     }
 
-    enterGame(id, name!);
+    enterGame(id, name, false);
   };
 
 

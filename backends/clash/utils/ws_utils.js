@@ -1,11 +1,14 @@
 import { room, db } from "../db/index.js"
 
 
-const broadCastData = (gameId, payload, socket) => {
-  const rooms = room.get(gameId)
-  for (const client in rooms) {
-    if (client !== socket || client.readyState === socket.OPEN) {
-      client.send(JSON.stringify(payload))
+// Send a payload to every open socket in a game's room.
+const broadCastData = (gameId, payload) => {
+  const sockets = room.get(gameId)
+  if (!sockets) return
+  const data = JSON.stringify(payload)
+  for (const client of sockets) {
+    if (client.readyState === client.OPEN) {
+      client.send(data)
     }
   }
 }
@@ -21,15 +24,20 @@ export const JoinPlayers = (socket, gameId) => {
       }))
     }
     if (!room.has(gameId)) {
-      const sockets = new Set()
-      room.set(gameId, sockets)
+      room.set(gameId, new Set())
     }
+    socket.gameId = gameId
     room.get(gameId).add(socket)
-    return socket.send(JSON.stringify({
-      type: "join",
+
+    // Tell the whole room how many of the expected players are now connected,
+    // so clients can start the countdown once everyone is in.
+    const total = db.get(gameId).players.length
+    broadCastData(gameId, {
+      type: "READY",
       code: 200,
-      msg: "Player joined"
-    }))
+      count: room.get(gameId).size,
+      total,
+    })
   } catch (err) {
     return socket.send(JSON.stringify({
       type: "ERROR",
@@ -49,13 +57,12 @@ export const handleClick = (socket, gameId, color, index) => {
         msg: "No Game found"
       }))
     }
-    const payload = {
+    broadCastData(gameId, {
       type: "CLICK",
       code: 200,
       index,
-      color
-    }
-    broadCastData(payload)
+      color,
+    })
   } catch (err) {
     return socket.send(JSON.stringify({
       type: "ERROR",
@@ -65,21 +72,22 @@ export const handleClick = (socket, gameId, color, index) => {
   }
 }
 
+
 export const handleStop = (socket, name) => {
   try {
-    if (!db.has(gameId) || !room.has(gameId)) {
+    const gameId = socket.gameId
+    if (!gameId || !db.has(gameId) || !room.has(gameId)) {
       return socket.send(JSON.stringify({
         type: "ERROR",
         code: 400,
         msg: "No Game found"
       }))
     }
-    const payload = {
+    broadCastData(gameId, {
       type: "STOP",
       code: 200,
-      name
-    }
-    broadCastData(payload)
+      name,
+    })
   } catch (err) {
     return socket.send(JSON.stringify({
       type: "ERROR",
@@ -87,4 +95,12 @@ export const handleStop = (socket, name) => {
       msg: "Backend Faced some issue"
     }))
   }
+}
+
+
+// Remove a socket from its room when it disconnects.
+export const handleDisconnect = (socket) => {
+  const gameId = socket.gameId
+  if (!gameId || !room.has(gameId)) return
+  room.get(gameId).delete(socket)
 }

@@ -23,9 +23,11 @@ export const getPlayer = (req, res) => {
     })
   }
 
-  const connections = new Set()
+  // Keep every subscriber for this game. Appending (instead of replacing the
+  // Set) is what lets an already-connected admin keep receiving broadcasts when
+  // a new player later subscribes.
+  const connections = broadCastConnection.get(gameId) ?? new Set()
   connections.add(res)
-
   broadCastConnection.set(gameId, connections)
 
   res.writeHead(200, {
@@ -35,6 +37,9 @@ export const getPlayer = (req, res) => {
   })
 
   res.write(`data:connection established\n\n`)
+  // Send the current roster immediately so a (re)connecting client sees the
+  // present state without waiting for the next change to be broadcast.
+  res.write(`data:${JSON.stringify(db.get(gameId))}\n\n`)
 
   const pingInterval = setInterval(() => {
     res.write("data:ping\n\n")
@@ -42,6 +47,7 @@ export const getPlayer = (req, res) => {
 
   res.on("close", () => {
     clearInterval(pingInterval)
+    connections.delete(res)
   })
 
 }
