@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...except the production defaults: NEXT_PUBLIC_* is inlined into the client
+# bundle at build time, so it holds no secrets and Render's git-based Docker
+# build needs it in the repo to bake the right backend URL.
+!.env.production
 
 # vercel
 .vercel

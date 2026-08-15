@@ -1,3 +1,4 @@
+import { API_URL } from "./config";
 import type { GameState } from "./types";
 
 export type PlayersSubscription = {
@@ -30,7 +31,7 @@ export const subscribePlayers = (
     rejectReady = reject;
   });
 
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/getPlayer/${gameId}`;
+  const url = `${API_URL}/getPlayer/${gameId}`;
 
   (async () => {
     try {

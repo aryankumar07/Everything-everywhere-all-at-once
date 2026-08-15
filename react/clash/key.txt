@@ -1,0 +1,1 @@
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQiZAocul3CmQ3xw8pWx7jgsryRRyoRgd7hsGaEt9o+ tarnished@tarnisheds-MacBook-Air.local

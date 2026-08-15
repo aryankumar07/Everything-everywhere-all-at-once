@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useRef } from "react";
+import { WS_URL } from "./config";
 
 // Messages the game backend broadcasts over the WebSocket (`/ws`). The server
 // uses upper-case type tags for gameplay, plus a lower-case "join" ack.
@@ -23,14 +24,6 @@ type SocketContextValue = {
 };
 
 const SocketContext = createContext<SocketContextValue | null>(null);
-
-// Derive the WS URL from the SAME host as the HTTP API (NEXT_PUBLIC_API_URL),
-// so the socket can never drift to a different/unreachable host than the
-// working /create, /join and SSE calls. http(s) -> ws(s), targeting `/ws`.
-const wsBase = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000")
-  .replace(/^http/, "ws")
-  .replace(/\/+$/, "");
-const WS_URL = wsBase.endsWith("/ws") ? wsBase : `${wsBase}/ws`;
 
 function waitForOpen(socket: WebSocket) {
   return new Promise<void>((resolve, reject) => {

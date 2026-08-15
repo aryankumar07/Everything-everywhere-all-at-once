@@ -9,6 +9,7 @@ RUN pnpm install --prod --frozen-lockfile
 
 COPY index.js ./
 COPY utils ./utils
+COPY db ./db
 
 EXPOSE 8000
 

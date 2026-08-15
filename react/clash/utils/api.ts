@@ -1,11 +1,12 @@
 import axios from "axios";
+import { API_URL } from "./config";
 import type { GameState, PendingIdentity } from "./types";
 
 // Axios talks to the Express lobby backend for the request/response endpoints
 // (`/create`, `/join`). The live `/getPlayer` stream is SSE and is handled
 // separately in `subscribePlayers.ts` (browser axios can't stream a POST SSE).
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
 });
 

@@ -1,0 +1,15 @@
+# Render blueprint for the Clash frontend (Docker).
+#
+# The backend (`clash-1-0-0`) is a SEPARATE Render service; this file only
+# describes the Next.js web service. The backend URL is baked in at build time
+# from `.env.production` — changing it requires a rebuild, not just an env edit.
+services:
+  - type: web
+    name: clash-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    autoDeploy: true
