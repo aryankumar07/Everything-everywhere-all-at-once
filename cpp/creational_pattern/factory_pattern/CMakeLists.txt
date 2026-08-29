@@ -4,7 +4,7 @@ project(factory_pattern
     DESCRIPTION "factory design demo with email"
     LANGUAGES CXX)
 
-add_executable(factory_pattern
+  add_executable(${PROJECT_NAME}
     main.cpp
     client.cpp
     ./Factory/alertEmailFactory.cpp
